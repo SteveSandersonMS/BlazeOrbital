@@ -1,0 +1,28 @@
+﻿.authbutton {
+    padding: 0.3rem 1rem;
+    border-radius: 0.4rem;
+}
+
+.authbutton + .authbutton {
+    margin-left: 0.75rem;
+}
+
+    .authbutton:hover {
+        background-color: rgba(255,255,255,0.2);
+    }
+
+    .authbutton:active {
+        background-color: rgba(255,255,255,0.3);
+    }
+
+.user-menu {
+    opacity: 0;
+    transform: scaleY(0.00);
+    transform-origin: top center;
+    transition: opacity 0.3s ease-in-out, transform .15s ease-in-out;
+}
+
+.authbutton:focus-within .user-menu {
+    opacity: 1;
+    transform: scaleY(1);
+}

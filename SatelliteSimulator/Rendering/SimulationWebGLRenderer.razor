@@ -1,0 +1,43 @@
+﻿@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<canvas @ref="canvasElem"></canvas>
+
+@code {
+    [Parameter] public App.Body[] Suns { get; set; }
+    [Parameter] public App.Body[] Satellites { get; set; }
+    [Parameter] public Action OnRenderFrame { get; set; }
+
+    private ElementReference canvasElem;
+    private DotNetObjectReference<SimulationWebGLRenderer> selfReference;
+    private IJSObjectReference module;
+    private IJSUnmarshalledObjectReference jsContext;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            selfReference = DotNetObjectReference.Create(this);
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./Rendering/SimulationWebGLRenderer.razor.js");
+            jsContext = await module.InvokeAsync<IJSUnmarshalledObjectReference>("init", canvasElem, selfReference);
+            jsContext.InvokeVoid("onNextFrame", nameof(RenderNextFrame));
+        }
+    }
+
+    [JSInvokable]
+    public void RenderNextFrame()
+    {
+        OnRenderFrame?.Invoke();
+        jsContext.InvokeUnmarshalled<App.Body[], object>("renderSuns", Suns);
+        jsContext.InvokeUnmarshalled<App.Body[], object>("renderSatellites", Satellites);
+        jsContext.InvokeVoid("onNextFrame", nameof(RenderNextFrame));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        jsContext?.InvokeVoid("disposeContext");
+        jsContext?.Dispose();
+        selfReference?.Dispose();
+        await (module?.DisposeAsync() ?? default);
+    }
+}

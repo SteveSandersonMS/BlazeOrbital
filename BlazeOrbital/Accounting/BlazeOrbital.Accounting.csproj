@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IdentityModel.OidcClient" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.101-preview.9.1843" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebView" Version="6.0.0-rc.2.21480.10" />
+    <ProjectReference Include="..\ManufacturingHub\BlazeOrbital.ManufacturingHub.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Images\**" />
+    <Resource Include="Images\**" />
+    <Content Update="wwwroot\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+	<!-- There's no WebAssembly in this application! It's all .NET Core and native code, including the Blazor part. -->
+	<!-- So, since this is a Windows app, it needs a Windows binary of the Rust library -->
+	<Content Condition="'$(OS)' == 'Windows_NT'" Include="..\rustqr\target\x86_64-pc-windows-msvc\debug\rustqr.dll">
+      <Link>librustqr.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

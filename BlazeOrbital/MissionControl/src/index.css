@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('fonts/fonts.css');
+
+html, body, #root {
+  font-family: 'Roboto Condensed';
+  min-height: 100vh;
+}
+
+#root, inventory-grid {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+inventory-grid { background: gray; }
+inventory-grid thead { top: 6.5rem !important; }
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+code {
+  color: #E01A76;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}

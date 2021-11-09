@@ -1,0 +1,21 @@
+{
+  "name": "BlazeOrbital Manufacturing",
+  "short_name": "Manufacturing Hub",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#c0c0c0",
+  "theme_color": "#1f2937",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ]
+}

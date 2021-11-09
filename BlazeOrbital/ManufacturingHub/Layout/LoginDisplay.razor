@@ -1,0 +1,40 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using BlazeOrbital.ManufacturingHub.Data
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+@inject IJSRuntime JS
+@inject IConfiguration Configuration
+
+<AuthorizeView>
+    <Authorized>
+        <button class="authbutton flex items-center relative px-3 py-1 text-left">
+            <div class="bg-blue-500 text-lg text-white font-bold rounded-full w-8 h-8 flex justify-center items-center mr-2">
+                <span style="margin-top: -2px;">@(context.User.Identity?.Name?.Substring(0, 1).ToUpper())</span>
+            </div>
+
+            @context.User.Identity?.Name
+            
+            <div class="user-menu absolute mt-2 top-9 right-0 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 text-gray-700" role="menu">
+                <a href="@(Configuration["BackendOrigin"])/Identity/Account/Manage" class="hover:bg-gray-200 px-4 py-2 text-sm block" role="menuitem">My profile</a>
+                <button @onclick="BeginSignOut" class="hover:bg-gray-200 block px-4 py-2 text-sm text-left block w-full" role="menuitem">Log out</button>
+            </div>
+        </button>
+    </Authorized>
+    <NotAuthorized>
+        <a class="authbutton" href="@(Configuration["BackendOrigin"])/Identity/Account/Register">Register</a>
+        <a class="authbutton" href="authentication/login">Log in</a>
+    </NotAuthorized>
+    <Authorizing>
+        <a class="authbutton">Authorizing...</a>
+    </Authorizing>
+</AuthorizeView>
+
+@code{
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        await JS.InvokeVoidAsync("localStorage.removeItem", OfflineAccountClaimsPrincipalFactory.OfflineClaimsKey);
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

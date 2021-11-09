@@ -1,0 +1,123 @@
+﻿@page "/inventory"
+@using Microsoft.EntityFrameworkCore
+@inject DataSynchronizer DataSynchronizer
+@implements IDisposable
+@attribute [Authorize]
+<PageTitle>Inventory</PageTitle>
+<SyncStatus />
+<PartDetails Part="selectedPart" OnHide="@(() => { selectedPart = null; })" />
+
+@if (db is not null)
+{
+    <div class="inventory-grid">
+        <Grid Virtualize="true" Items="@GetFilteredParts()" ItemKey="@(x => x.PartId)" ItemSize="35">
+
+            <TemplateColumn Title="Category" SortBy="@(items => items.SortByAscending(x => x.Category).ThenAscending(x => x.Subcategory))" Class="col-category">
+                <ChildContent>@context.Category / @context.Subcategory</ChildContent>
+                <ColumnOptions>
+                    <p>Category (@categories.Length)</p>
+                    <select multiple class="w-64 bg-gray-100 border-grey-500 border my-4" @bind="categories" @onclick="@(() => subcategories = Array.Empty<string>())">
+                        @foreach (var name in db.Parts.Select(x => x.Category).Distinct())
+                        {
+                            <option>@name</option>
+                        }
+                    </select>
+
+                    <p>Subcategory (@subcategories.Length)</p>
+                    <select multiple class="w-64 bg-gray-100 border-grey-500 border my-4" @bind="subcategories">
+                        @foreach (var name in db.Parts.Where(x => categories.Contains(x.Category)).Select(x => x.Subcategory).Distinct())
+                        {
+                            <option>@name</option>
+                        }
+                    </select>
+
+                    <div><button class="bg-gray-200 px-5 py-1 mb-2" @onclick="@(() => { categories = Array.Empty<string>(); subcategories = Array.Empty<string>(); })">Reset</button></div>
+                </ColumnOptions>
+            </TemplateColumn>
+
+            <PropertyColumn Title="Name" Property="@(x => x.Name)" Class="col-name" OnCellClicked="@((Part part) => { selectedPart = part; })">
+                <ColumnOptions>
+                    <input @bind="searchName" @bind:event="oninput" type="search" placeholder="Search..." />
+                </ColumnOptions>
+            </PropertyColumn>
+
+            <PropertyColumn Title="Location" Property="@(x => x.Location)" Class="col-location" />
+
+            <PropertyColumn Title="Stock" Property="@(x => x.Stock)" Format="N0" Align="Align.Right" Class="col-stock">
+                <ColumnOptions>
+                    <p>Min stock</p>
+                    <input type="range" @bind="minStock" @bind:event="oninput" min="0" max="50000" />
+                    <p>Max stock</p>
+                    <input type="range" @bind="maxStock" @bind:event="oninput" min="0" max="50000" />
+                </ColumnOptions>
+            </PropertyColumn>
+
+            <PropertyColumn Title="Cost ($)" Property="@(x => x.PriceCents/100)" Format="N0" Align="Align.Right" Class="col-cost" />
+
+        </Grid>
+        <div class="status-bar">
+            Showing @GetFilteredParts()?.Count().ToString("N0") items
+        </div>
+    </div>
+}
+
+@code {
+    ClientSideDbContext? db;
+
+    [Parameter] public string? SearchName { get; set; }
+
+    string[] categories = Array.Empty<string>();
+    string[] subcategories = Array.Empty<string>();
+    string searchName = string.Empty;
+    int minStock, maxStock = 50000;
+    Part? selectedPart;
+
+    IQueryable<Part>? GetFilteredParts()
+    {
+        if (db is null)
+        {
+            return null;
+        }
+
+        var result = db.Parts.AsNoTracking().AsQueryable();
+        if (categories.Any())
+        {
+            result = result.Where(x => categories.Contains(x.Category));
+        }
+        if (subcategories.Any())
+        {
+            result = result.Where(x => subcategories.Contains(x.Subcategory));
+        }
+        if (!string.IsNullOrEmpty(searchName))
+        {
+            result = result.Where(x => EF.Functions.Like(x.Name, searchName.Replace("%", "\\%") + "%", "\\"));
+        }
+        if (minStock > 0)
+        {
+            result = result.Where(x => x.Stock >= minStock);
+        }
+        if (maxStock < 50000)
+        {
+            result = result.Where(x => x.Stock <= maxStock);
+        }
+
+        return result;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = await DataSynchronizer.GetPreparedDbContextAsync();
+        DataSynchronizer.OnUpdate += StateHasChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        searchName = SearchName ?? string.Empty;
+    }
+
+    public void Dispose()
+    {
+        db?.Dispose();
+        DataSynchronizer.OnUpdate -= StateHasChanged;
+    }
+}

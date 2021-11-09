@@ -1,0 +1,29 @@
+﻿header {
+    background: #ddd;
+    padding: 10px 20px;
+}
+
+article {
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+}
+
+input {
+    padding: 0.3rem 0.5rem;
+}
+
+button {
+    background-color: #33F;
+    color: white;
+    padding: 0.3rem 1rem;
+    border: none;
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: #44F;
+    }
+    button:active {
+        background-color: #66F;
+    }

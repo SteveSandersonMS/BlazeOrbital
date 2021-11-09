@@ -1,0 +1,30 @@
+﻿@inject DataSynchronizer Data
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <div class="not-authorized bg-gray-800 text-white py-5 px-6 rounded" role="alert">
+                        <p>You are not authorized to access this resource.</p>
+                        @if (context.User.Identity?.IsAuthenticated != true)
+                        {
+                            <a href="authentication/login" class="bg-white text-black py-1 px-4 mt-3 rounded inline-block">
+                                Log in
+                            </a>
+                        }
+                    </div>
+                </NotAuthorized>
+                <Authorizing>
+                    <div class="authorizing md:hidden">Authorizing...</div>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

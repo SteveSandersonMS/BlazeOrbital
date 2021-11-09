@@ -1,0 +1,38 @@
+﻿syntax = "proto3"; 
+option csharp_namespace = "BlazeOrbital.Data";
+
+service ManufacturingData { 
+	rpc GetDashboardData (DashboardRequest) returns (DashboardReply);
+	rpc GetParts (PartsRequest) returns (PartsReply); 
+}
+
+message DashboardRequest {}
+message DashboardReply {
+	int32 projectsBookedValue = 1;
+	int64 nextDeliveryDueInMs = 2;
+	int32 staffOnSite = 3;
+	int64 factoryUptimeMs = 4;
+	int32 servicingTasksDue = 5;
+	int32 machinesStopped = 6;
+}
+
+message PartsRequest {
+	int64 modifiedSinceTicks = 1;
+	int32 maxCount = 2;
+}
+
+message PartsReply {
+	repeated Part parts = 1;
+	int32 modifiedCount = 2;
+}
+
+message Part {
+	int32 partId = 1;
+	int64 modifiedTicks = 2;
+	string category = 3;
+	string subcategory = 4;
+	string name = 5;
+	string location = 6;
+	int32 stock = 7;
+	int64 priceCents = 8;
+}

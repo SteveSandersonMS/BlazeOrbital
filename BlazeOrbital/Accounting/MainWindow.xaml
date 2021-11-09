@@ -1,0 +1,75 @@
+﻿<Window x:Class="BlazeOrbital.Accounting.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:accounting="clr-namespace:BlazeOrbital.Accounting"
+        mc:Ignorable="d"
+        Title="BlazeOrbital Accounting" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Ribbon SelectedIndex="0" SelectionChanged="RibbonWin_SelectionChanged">
+            <!-- Help Pane, located at the right-hand side -->
+            <Ribbon.HelpPaneContent>
+                <RibbonButton SmallImageSource="Images\HelpApplication_256x.png" />
+            </Ribbon.HelpPaneContent>
+            <!-- Quick Access Toolbar - located at the upper-left corner -->
+            <Ribbon.QuickAccessToolBar>
+                <RibbonQuickAccessToolBar>
+                    <RibbonButton x:Name ="Save" SmallImageSource="Images\Save_256x.png" />
+                    <RibbonSplitButton x:Name ="Undo" SmallImageSource="Images\Undo_grey_256x.png" />
+                    <RibbonSplitButton x:Name="Redo" SmallImageSource="Images\Redo_grey_16x.png" />
+                </RibbonQuickAccessToolBar>
+            </Ribbon.QuickAccessToolBar>
+            <!-- Application Menu, located at the left-hand side (down arrow) -->
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu KeyTip="F" />
+            </Ribbon.ApplicationMenu>
+            <!-- Ribbon Tab #1: Home -->
+            <RibbonTab Header="Main" KeyTip="H" >
+                <RibbonGroup Header="Edit">
+                    <RibbonMenuButton LargeImageSource="Images\PasteTable_32x.png" Label="Paste" KeyTip="V" />
+                    <RibbonButton SmallImageSource="Images\Cut_24x.png" Label="Cut" KeyTip="X" />
+                    <RibbonButton SmallImageSource="Images\Copy_32x.png" Label="Copy" KeyTip="C" />
+                    <RibbonButton SmallImageSource="Images\FormatSelection_16x.png" Label="Format Painter" KeyTip="FP" />
+                </RibbonGroup>
+                <RibbonGroup Header="Human Resources">
+                    <RibbonMenuButton LargeImageSource="Images\User_64x.png" Label="Employee" KeyTip="V" />
+                    <RibbonButton SmallImageSource="Images\Save_256x.png" Label="Save" KeyTip="X" />
+                    <RibbonButton SmallImageSource="Images\Add_grey_16x.png" Label="Add" KeyTip="C" />
+                </RibbonGroup>
+                <RibbonGroup Header="Report">
+                    <RibbonMenuButton LargeImageSource="Images\Report_256x.png" Label="Cashflow" KeyTip="V" />
+                </RibbonGroup>
+                <RibbonGroup Header="Auth">
+                    <RibbonButton SmallImageSource="Images\Login_256x.png" Label="Log in" Click="LogIn_Click" />
+                    <RibbonButton SmallImageSource="Images\Exit_16x.png" Label="Log out" Click="LogOut_Click" />
+                </RibbonGroup>
+            </RibbonTab>
+            <RibbonTab Header="Reports" KeyTip="I" />
+            <RibbonTab Header="Sales" />
+            <RibbonTab Header="Invoices" />
+            <RibbonTab Header="Rules" />
+            <RibbonTab Header="Inventory" KeyTip="I" x:Name="inventoryTab">
+                <RibbonGroup Header="Edit">
+                    <RibbonMenuButton LargeImageSource="Images\PasteTable_32x.png" Label="Paste" KeyTip="V" />
+                    <RibbonButton SmallImageSource="Images\Cut_24x.png" Label="Cut" KeyTip="X" />
+                    <RibbonButton SmallImageSource="Images\Copy_32x.png" Label="Copy" KeyTip="C" />
+                    <RibbonButton SmallImageSource="Images\FormatSelection_16x.png" Label="Format Painter" KeyTip="FP" />
+                </RibbonGroup>
+                <RibbonGroup Header="Auth">
+                    <RibbonButton SmallImageSource="Images\Login_256x.png" Label="Log in" Click="LogIn_Click" />
+                    <RibbonButton SmallImageSource="Images\Exit_16x.png" Label="Log out" Click="LogOut_Click" />
+                </RibbonGroup>
+            </RibbonTab>
+        </Ribbon>
+
+        <ScrollViewer x:Name="HomePanel" Grid.Row="2" MaxHeight="800">
+            <Image Source="Images\Accounts.png" HorizontalAlignment="Left" VerticalAlignment="Top" Height="800" />
+        </ScrollViewer>
+        
+        <DockPanel x:Name="InventoryPanel" Grid.Row="2" />
+    </Grid>
+</Window>

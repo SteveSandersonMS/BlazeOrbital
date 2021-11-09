@@ -1,0 +1,45 @@
+﻿@if (Part is not null)
+{
+    <div class="darken-bg inset-0 z-10 fixed top-0 flex justify-center items-center" @onclick="OnHide">
+        <div tabindex="0" @ref="overlayElement" class="overlay bg-gray-200 relative shadow-lg" @onclick:stopPropagation>
+            <header class="bg-gray-800 font-bold text-white px-6 py-4 flex items-center">
+                <span>Stock label</span>
+                <button class="bg-green-500 text-white px-5 py-1 ml-auto">Print</button>
+                <button class="bg-gray-400 text-white px-5 py-1 ml-2" @onclick="OnHide">Close</button>
+            </header>
+
+            <section class="py-4 px-6 uppercase text-lg">
+                <div class="stock-label bg-white p-8 shadow-lg border border-gray-600 max-w-xl">
+                    <div class="w-36 h-36 mb-4">
+                        <QRCode Value="@Part.Url" />
+                    </div>
+
+                    <p class="text-gray-500 my-2">@Part.Category ▸ @Part.Subcategory</p>
+                    <p class="text-3xl font-bold my-2">@Part.Name</p>
+                    <p class="text-gray-500 my-4">Unit cost: $@((Part.PriceCents / 100.0).ToString("N2"))</p>
+                    <p class="bg-black text-xl text-white px-5 py-1 font-bold inline-block mt-3">Location: @Part.Location</p>
+                </div>
+            </section>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public Part? Part { get; set; }
+    [Parameter] public EventCallback OnHide { get; set; }
+
+    ElementReference overlayElement;
+    bool wasShownBefore;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Whenever we're becoming visible, take focus
+        var isShown = Part is not null;
+        if (isShown && !wasShownBefore)
+        {
+            await overlayElement.FocusAsync();
+        }
+
+        wasShownBefore = isShown;
+    }
+}

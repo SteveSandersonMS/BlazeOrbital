@@ -1,0 +1,24 @@
+﻿@using System.Runtime.InteropServices
+@inject IJSRuntime JS
+
+<canvas @ref="canvasElem"></canvas>
+
+@code {
+    [DllImport("librustqr")]
+    static extern void generate_qr_code(string contents, byte[] buffer, int bufferLength, out int width, out int height);
+
+    [Parameter] public string Value { get; set; } = string.Empty;
+
+    ElementReference canvasElem;
+    byte[] buffer = new byte[256 * 256 * 4];
+    int width = 100;
+    int height = 100;
+
+    protected override void OnParametersSet()
+    {
+        generate_qr_code(Value, buffer, buffer.Length, out width, out height);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+        => await JS.InvokeVoidAsync("bufferToCanvas", canvasElem, buffer, width, height);
+}

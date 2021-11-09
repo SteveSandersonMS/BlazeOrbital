@@ -1,0 +1,10 @@
+﻿@page "/authentication/{action}"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+<div class="mt-96 text-white text-center text-2xl font-thin">
+    <RemoteAuthenticatorView Action="@Action" />
+</div>
+
+@code{
+    [Parameter] public string? Action { get; set; }
+}

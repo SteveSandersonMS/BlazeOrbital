@@ -1,0 +1,72 @@
+﻿<header>
+    Satellites:
+    <input type="number" value="@satellites.Length" @oninput="@(evt => SpawnSatellites(int.Parse((string)evt.Value)))" />
+    <button @onclick="OnInitialized">Restart</button>
+</header>
+<article>
+    <SimulationWebGLRenderer Suns="suns" Satellites="satellites" OnRenderFrame="OnRenderFrame" />
+</article>
+
+@code {
+    public struct Body
+    {
+        public Point Pos, Vel;
+        public float Mass;
+        public Color Color;
+
+        public Body Respawn()
+        {
+            // Random position/velocity/color
+            Pos = new Point(Random.Shared.Next(10000), Random.Shared.Next(10000));
+            Vel = new Point((float)(Random.Shared.NextDouble() * 2 - 1), ((float)Random.Shared.NextDouble() * 2 - 1)) * 25f;
+            Color = Color.Presets[Random.Shared.Next(Color.Presets.Length)];
+            return this;
+        }
+    }
+
+    Body[] satellites = new Body[100];
+    Body[] suns = new Body[2];
+
+    protected override void OnInitialized()
+    {
+        suns[0] = new Body { Pos = new Point(5000, 3700), Vel = new Point(22, 0), Mass = 2000000, Color = new Color(1, 1, 0, 1) };
+        suns[1] = new Body { Pos = new Point(5000, 6300), Vel = new Point(-22, 0), Mass = 2000000, Color = new Color(1, 1, 0, 1) };
+        SpawnSatellites(satellites.Length);
+    }
+
+    void SpawnSatellites(int count)
+        => satellites = Enumerable.Range(0, count).Select(_ => new Body().Respawn()).ToArray();
+
+    void OnRenderFrame()
+    {
+        // Do physics for each body (both suns and satellites)
+        for (var i = 0; i < suns.Length; i++)
+            RunPhysicsForBody(ref suns[i]);
+        for (var i = 0; i < satellites.Length; i++)
+            RunPhysicsForBody(ref satellites[i]);
+    }
+
+    void RunPhysicsForBody(ref Body body)
+    {
+        // For each sun...
+        for (var sunIndex = 0; sunIndex < suns.Length; sunIndex++)
+        {
+            ref var sun = ref suns[sunIndex];
+            if (body.Pos != sun.Pos)
+            {
+                // ... apply sun's gravitational force to the body
+                const float G = 1f;
+                var deltaPos = sun.Pos - body.Pos;
+                var acceleration = G * sun.Mass / deltaPos.LengthSquared;
+                body.Vel += deltaPos.Direction * acceleration;
+            }
+        }
+
+        // Move it
+        body.Pos += body.Vel;
+
+        // If it's lost in space, respawn it
+        if (body.Pos.X < -1000 || body.Pos.X > 11000 || body.Pos.Y < -1000 || body.Pos.Y > 11000)
+            body.Respawn();
+    }
+}

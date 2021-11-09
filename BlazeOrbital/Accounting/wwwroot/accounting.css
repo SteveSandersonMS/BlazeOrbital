@@ -1,0 +1,13 @@
+﻿body {
+    min-height: 100vh;
+    font-size: 14px;
+}
+
+#app {
+    display: flex;
+    flex-grow: 1;
+}
+
+.inventory-grid thead {
+    top: 0 !important; /* Because there's no sticky header bar when we show the Inventory component on its own */
+}

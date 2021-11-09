@@ -1,0 +1,170 @@
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+    
+thead {
+    position: sticky;
+    top: 0;
+}
+
+th {
+    padding: 0;
+    font-weight: normal;
+    position: relative;
+}
+
+.column-title-flex {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    user-select: none;
+    overflow: hidden;
+}
+
+.column-title {
+    display: flex;
+    align-items: center;
+    min-width: 0px;
+    flex-grow: 1;
+}
+
+.title-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.sortable {
+    border: none;
+    background: none;
+    position: relative;
+    cursor: pointer;
+}
+
+.sortable:active, .column-options-button:active, .column-options-button:hover:active {
+    background: rgba(0,0,0,0.15);
+}
+
+.sortable:active + .column-options-button {
+    background: rgba(0,0,0,0.29);
+}
+
+th:hover .column-title-flex, th:focus-within .column-title-flex {
+    filter: brightness(0.93);
+}
+
+th.sorted-asc:focus-within .column-title-flex, th.sorted-desc:focus-within .column-title-flex {
+    filter: brightness(0.85);
+}
+
+.sort-indicator {
+    width: 1.5rem;
+    height: 1rem;
+    opacity: 0.4;
+    flex-shrink: 0;
+    text-align: center;
+    padding-right: 0.2rem;
+    display: inline-block;
+    align-items: center;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAxNiAyOCI+PGcgaWQ9Imljb21vb24taWdub3JlIj48L2c+PHBhdGggZD0iTTE2IDE3cTAgMC40MDYtMC4yOTcgMC43MDNsLTcgN3EtMC4yOTcgMC4yOTctMC43MDMgMC4yOTd0LTAuNzAzLTAuMjk3bC03LTdxLTAuMjk3LTAuMjk3LTAuMjk3LTAuNzAzdDAuMjk3LTAuNzAzIDAuNzAzLTAuMjk3aDE0cTAuNDA2IDAgMC43MDMgMC4yOTd0MC4yOTcgMC43MDN6TTE2IDExcTAgMC40MDYtMC4yOTcgMC43MDN0LTAuNzAzIDAuMjk3aC0xNHEtMC40MDYgMC0wLjcwMy0wLjI5N3QtMC4yOTctMC43MDMgMC4yOTctMC43MDNsNy03cTAuMjk3LTAuMjk3IDAuNzAzLTAuMjk3dDAuNzAzIDAuMjk3bDcgN3EwLjI5NyAwLjI5NyAwLjI5NyAwLjcwM3oiIGZpbGw9IiMwMDAwMDAiPjwvcGF0aD48L3N2Zz4=);
+    background-size: contain;
+    background-position: 30% 50%;
+    background-repeat: no-repeat;
+}
+
+.sorted-asc .sort-indicator, .sorted-desc .sort-indicator {
+    background: none;
+    opacity: 0.6;
+    margin-top: -0.6rem;
+}
+
+.sorted-asc .sort-indicator:before {
+    content: '▲';
+}
+
+.sorted-desc .sort-indicator:before {
+    content: '▼';
+}
+
+.column-options-button {
+    border: none;
+    opacity: 0.3        ;
+    margin-left: auto;
+}
+
+.column-options-button:hover {
+    opacity: 1;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.column-options-button:before {
+    content: '☰';
+    margin: 0;
+    padding: 0 0.5rem;
+    text-align: center;
+}
+
+th:hover .column-options-button, th:focus-within .column-options-button {
+    opacity: 1;
+}
+
+.column-options {
+    position: absolute;
+    background: white;
+    filter: brightness(1);
+    border: 1px solid silver;
+    right: 0;
+    padding: 1rem;
+    box-shadow: 0px 2px 2px rgba(0,0,0,0.25);
+}
+
+.column-width-draghandle {
+    position: absolute;
+    z-index: 100;
+    top: 0; bottom: 0; right: -0.5rem;
+    width: 0.7rem;
+    cursor: ew-resize;
+}
+
+.column-width-draghandle:after {
+    content: ' ';
+    border-left: 1px solid rgba(0,0,0,0.1);
+    position: absolute; top: 0.4rem; bottom: 0.4rem; left: 0.35rem;
+}
+
+.column-width-draghandle:hover {
+    background: #aaa;
+}
+
+.column-width-draghandle:hover:after {
+    border-color: white;
+}
+
+th:last-of-type .column-width-draghandle {
+    display: none;
+}
+
+th.grid-col-center .column-title-flex {
+    justify-content: center;
+}
+
+th.grid-col-center .column-title {
+    justify-content: center;
+}
+
+th.grid-col-right .column-title-flex {
+    justify-content: flex-end;
+}
+
+th.grid-col-right .column-title {
+    justify-content: flex-end;
+}
+
+td.grid-col-center {
+    text-align: center;
+}
+
+td.grid-col-right {
+    text-align: right;
+}

@@ -1,0 +1,102 @@
+﻿.inventory-grid {
+    position: relative;
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+    .inventory-grid::after {
+        /* This appears while the user is scrolling before the browser paints the new rows. It's less jarring for the background to be white than dark gray. */
+        content: " ";
+        background: white;
+        position: fixed;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+.status-bar {
+    width: calc(100vw - var(--scrollbar-width));
+    background-color: rgb(31,41,55);
+    color: white;
+    bottom: 0;
+    left: 0;
+    position: sticky;
+    padding: 0.5rem;
+}
+
+::deep .col-cost, ::deep .col-stock {
+    width: max(10vw, 6rem);
+}
+
+::deep .col-name {
+    width: max(25vw, 10rem);
+    text-overflow: ellipsis;
+}
+
+::deep .col-category {
+    width: max(20vw, 9rem);
+    text-overflow: ellipsis;
+}
+
+::deep .col-location {
+    width: max(15vw, 7rem);
+}
+
+::deep thead {
+    top: 4rem;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 30%);
+}
+
+::deep table {
+    border-collapse: collapse;
+    background: repeating-linear-gradient(#f5f5f5, #f5f5f5 35px, #fff 35px, #fff 70px);
+}
+
+::deep .column-title-flex {
+    background-color: #eee;
+}
+
+::deep .column-title {
+    padding: 5px 8px;
+}
+
+::deep tr, ::deep .column-title-flex {
+    height: 35px;
+}
+
+::deep tbody tr:hover {
+    background: rgba(0,0,0,0.05);
+    outline: 1px solid #ffa50073;
+}
+
+::deep td {
+    padding: 3px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+::deep .col-date {
+    width: 100px;
+}
+
+::deep tbody .col-name:hover {
+    color: #08F;
+    background-color: rgba(0,0,0,0.05);
+}
+
+::deep tbody .col-name button {
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+::deep input[type=search] {
+    width: 10rem;
+    border: 1px solid rgb(209,213,219);
+    border-radius: 9999px;
+    padding: 0.5rem 1.25rem;
+}

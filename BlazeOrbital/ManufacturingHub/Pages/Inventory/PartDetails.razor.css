@@ -1,0 +1,47 @@
+﻿.darken-bg {
+    background: rgba(0,0,0,0.6);
+    animation: fade-in 0.1s ease-in-out;
+}
+
+.overlay {
+    animation: slide-up 0.2s cubic-bezier(.08,.72,.07,1.03);
+}
+
+.stock-label {
+    position: relative;
+    width: 36rem;
+}
+
+    .stock-label::before {
+        content: ' ';
+        position: absolute;
+        bottom: 1rem;
+        right: 2rem;
+        width: 10rem;
+        height: 5rem;
+        background-image: url('blazeorbital-logo.svg');
+        background-repeat: no-repeat;
+        background-position: bottom right;
+        background-size: contain;
+        opacity: 0.2;
+    }
+
+@keyframes fade-in {
+    from {
+        opacity: 0
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+@keyframes slide-up {
+    from {
+        transform: translateY(60px) scale(0.7);
+    }
+
+    to {
+        transform: translateY(0px) scale(1);
+    }
+}

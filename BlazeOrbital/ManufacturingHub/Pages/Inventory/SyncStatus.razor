@@ -1,0 +1,44 @@
+﻿@inject DataSynchronizer DataSynchronizer
+@implements IDisposable
+
+@if (DataSynchronizer.SyncCompleted < DataSynchronizer.SyncTotal)
+{
+    <div class="bg-gray-500 fixed text-white text-center z-10 left-0 right-0 bottom-5 w-96 m-auto p-5 rounded-xl" style="height: min-content; box-shadow: 0 4px 8px rgb(0 0 0 / 50%);">
+        <div>Getting updated data...</div>
+        <div class="bg-gray-100 h-4 my-5 rounded-full p-1">
+            <div class="bg-green-400 h-full rounded-full" style="width: @(100 * DataSynchronizer.SyncCompleted / DataSynchronizer.SyncTotal)%"></div>
+        </div>
+        <div>@DataSynchronizer.SyncCompleted.ToString("N0") / @DataSynchronizer.SyncTotal.ToString("N0")</div>
+    </div>
+}
+
+@if (syncException is not null)
+{
+    <div class="bg-gray-500 flex fixed text-white text-left z-10 left-0 right-0 bottom-5 w-96 m-auto p-5 rounded-xl" style="height: min-content; box-shadow: 0 4px 8px rgb(0 0 0 / 50%);">
+        <div role="alert">Unable to get updates from the server.<br />Check your internet connection.</div>
+        <button title="Close error popup" class="h-4 ml-auto" @onclick="@(() => { syncException = null; })">⨯</button>
+    </div>
+}
+
+@code {
+    Exception? syncException;
+
+    protected override void OnInitialized()
+    {
+        DataSynchronizer.SynchronizeInBackground();
+        DataSynchronizer.OnUpdate += StateHasChanged;
+        DataSynchronizer.OnError += HandleSyncError;
+    }
+
+    public void Dispose()
+    {
+        DataSynchronizer.OnUpdate -= StateHasChanged;
+        DataSynchronizer.OnError -= HandleSyncError;
+    }
+
+    void HandleSyncError(Exception ex)
+    {
+        syncException = ex;
+        StateHasChanged();
+    }
+}

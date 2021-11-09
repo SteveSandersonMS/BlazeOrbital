@@ -1,0 +1,257 @@
+﻿@using Microsoft.AspNetCore.Components.Rendering
+@using System.Linq.Expressions
+@typeparam TGridItem
+@attribute [CascadingTypeParameter(nameof(TGridItem))]
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+@{
+    _columns.Clear();
+}
+<CascadingValue IsFixed="true" Value="@_addColumnCallback">
+    @ChildContent
+    <Defer>
+        <table aria-rowcount="@_rowCount" @ref="_tableReference" @onclosecolumnoptions="CloseColumnOptions">
+            <thead>
+                <tr>
+                    @RenderColumnHeaders
+                </tr>
+            </thead>
+            <tbody>
+                @if (Virtualize)
+                {
+                    <Virtualize @ref="@_virtualizeComponent"
+                        TItem="(int RowIndex, TGridItem Data)"
+                        ItemSize="@ItemSize"
+                        ItemsProvider="@ProvideVirtualizedItems"
+                        ItemContent="@(item => builder => RenderRow(builder, item.RowIndex, item.Data))" />
+                }
+                else
+                {
+                    @RenderRows
+                }
+            </tbody>
+        </table>
+    </Defer>
+</CascadingValue>
+
+@code {
+    internal delegate void AddColumnCallback(ColumnBase<TGridItem> column);
+
+    [Parameter, EditorRequired] public IQueryable<TGridItem>? Items { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Virtualize { get; set; }
+    [Parameter] public bool ResizableColumns { get; set; }
+    [Parameter] public float ItemSize { get; set; } = 50;
+    [Parameter] public Func<TGridItem, object> ItemKey { get; set; } = x => x;
+
+    private Virtualize<(int, TGridItem)>? _virtualizeComponent;
+    private List<ColumnBase<TGridItem>> _columns;
+    private AddColumnCallback _addColumnCallback;
+    private ColumnBase<TGridItem>? _sortByColumn;
+    private ColumnBase<TGridItem>? _displayOptionsForColumn;
+    private bool _checkColumnOptionsPosition;
+    private bool _sortByAscending;
+    private IQueryable<TGridItem>? _previousItems;
+    private int _rowCount;
+    private IJSObjectReference? _jsModule;
+    private IJSObjectReference? _jsEventDisposable;
+    private ElementReference _tableReference;
+
+    private IQueryable<TGridItem>? SortedItems
+        => _sortByColumn is null || Items is null ? Items : _sortByColumn.GetSortedItems(Items, _sortByAscending);
+
+    public Grid()
+    {
+        _columns = new();
+        _addColumnCallback = _columns.Add;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/QuickGrid/Grid.razor.js");
+            _jsEventDisposable = await _jsModule.InvokeAsync<IJSObjectReference>("init", _tableReference);
+        }
+
+        if (_checkColumnOptionsPosition && _displayOptionsForColumn is not null)
+        {
+            _checkColumnOptionsPosition = false;
+            _ = _jsModule?.InvokeVoidAsync("checkColumnOptionsPosition", _tableReference);
+        }
+    }
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        _previousItems = Items;
+        return base.SetParametersAsync(parameters);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        _rowCount = (Items?.Count() ?? 0) + 1; // The extra 1 is the header row. This matches the default behavior.
+        return _virtualizeComponent is not null && Items != _previousItems
+            ? _virtualizeComponent.RefreshDataAsync()
+            : Task.CompletedTask;
+    }
+
+    private void RenderRows(RenderTreeBuilder builder)
+    {
+        var rowIndex = 2; // aria-rowindex is 1-based, plus the first row is the header
+        foreach (var item in SortedItems ?? Enumerable.Empty<TGridItem>())
+        {
+            RenderRow(builder, rowIndex++, item);
+        }
+    }
+
+    private void RenderRow(RenderTreeBuilder __builder, int rowIndex, TGridItem item)
+    {
+        <tr @key="@(ItemKey(item))" aria-rowindex="@rowIndex">
+            @foreach (var col in _columns)
+            {
+                <td class="@ColumnClass(col)" @key="@col">@col.CellContent(item)</td>
+            }
+        </tr>
+    }
+
+    private void RenderColumnHeaders(RenderTreeBuilder builder)
+    {
+        foreach (var col in _columns)
+        {
+            RenderColumnHeader(builder, col);
+        }
+    }
+
+    private void RenderColumnHeader(RenderTreeBuilder __builder, ColumnBase<TGridItem> col)
+    {
+        <th class="@ColumnHeaderClass(col)" aria-sort="@AriaSortValue(col)" @key="@col" scope="col">
+            <div class="column-title-flex">
+                @if (col.CanSort)
+                {
+                    <button class="column-title sortable" @onclick="@(() => OnHeaderClicked(col))">
+                        <span class="sort-indicator" aria-hidden="true"></span>
+                        <div class="title-text">@col.HeaderContent</div>
+                    </button>
+                }
+                else
+                {
+                    <div class="column-title">
+                        <div class="title-text">@col.HeaderContent</div>
+                    </div>
+                }
+
+                @if (col.ColumnOptions is not null)
+                {
+                    <button class="column-options-button" @onclick="@(() => OnColumnOptionsButtonClicked(col))"></button>
+                }
+            </div>
+
+            @if (col == _displayOptionsForColumn)
+            {
+                <div class="column-options">
+                    @col.ColumnOptions
+                </div>
+            }
+
+            @if (ResizableColumns)
+            {
+                <div class="column-width-draghandle"></div>
+            }
+        </th>
+    }
+
+    private string AriaSortValue(ColumnBase<TGridItem> column)
+        => _sortByColumn == column
+            ? (_sortByAscending ? "ascending" : "descending")
+            : "none";
+
+    private string? ColumnHeaderClass(ColumnBase<TGridItem> column)
+        => _sortByColumn == column
+        ? $"{ColumnClass(column)} {(_sortByAscending ? "sorted-asc" : "sorted-desc")}"
+        : ColumnClass(column);
+
+    private string? ColumnClass(ColumnBase<TGridItem> column)
+    {
+        switch (column.Align)
+        {
+            case Align.Center: return $"grid-col-center {column.Class}";
+            case Align.Right: return $"grid-col-right {column.Class}";
+            default: return column.Class;
+        }
+    }
+
+    private async Task OnHeaderClicked(ColumnBase<TGridItem> column)
+    {
+        if (column.CanSort)
+        {
+            if (_sortByColumn == column)
+            {
+                _sortByAscending = !_sortByAscending;
+            }
+            else
+            {
+                _sortByAscending = true;
+                _sortByColumn = column;
+            }
+
+            if (_virtualizeComponent is not null)
+            {
+                await _virtualizeComponent.RefreshDataAsync();
+            }
+        }
+    }
+
+    private void OnColumnOptionsButtonClicked(ColumnBase<TGridItem> column)
+    {
+        _displayOptionsForColumn = column;
+        _checkColumnOptionsPosition = true;
+    }
+
+    private async ValueTask<ItemsProviderResult<(int, TGridItem)>> ProvideVirtualizedItems(ItemsProviderRequest request)
+    {
+        if (Items is null)
+        {
+            return new ItemsProviderResult<(int, TGridItem)>(Enumerable.Empty<(int, TGridItem)>(), 0);
+        }
+        else
+        {
+            // Debounce the requests. This eliminates a lot of redundant queries at the cost of slight lag after interactions.
+            // If you wanted, you could try to make it only debounce on the 2nd-and-later request within a cluster.
+            await Task.Delay(20);
+            if (request.CancellationToken.IsCancellationRequested)
+            {
+                return default;
+            }
+
+            var records = SortedItems!.Skip(request.StartIndex).Take(request.Count).AsEnumerable();
+            var result = new ItemsProviderResult<(int, TGridItem)>(
+                items: records.Select((x, i) => ValueTuple.Create(i + request.StartIndex + 2, x)),
+                totalItemCount: Items.Count());
+            return result;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (_jsEventDisposable is not null)
+            {
+                await _jsEventDisposable.InvokeVoidAsync("stop");
+                await _jsEventDisposable.DisposeAsync();
+            }
+            if (_jsModule is not null)
+            {
+                await _jsModule.DisposeAsync();
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    void CloseColumnOptions()
+    {
+        _displayOptionsForColumn = null;
+    }
+}

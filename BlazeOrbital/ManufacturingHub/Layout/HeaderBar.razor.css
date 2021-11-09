@@ -1,0 +1,45 @@
+﻿nav {
+    width: calc(100vw - var(--scrollbar-width));
+}
+
+::deep .navlink {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    margin: 0.2rem 0.5rem;
+    padding: 0.4rem 1.2rem;
+}
+
+    ::deep .navlink.active {
+        background-color: black;
+    }
+
+    ::deep .navlink:not(.active):hover {
+        background-color: rgba(0,0,0,0.3);
+    }
+
+.mobile-title ::deep .navlink {
+    background: none;
+    padding: 0;
+    font-size: 1.1rem;
+    margin-left: 0rem;
+}
+
+.mobile-title ::deep .navlink:not(.active) {
+    display: none;
+}
+
+.logo {
+    filter: invert(1);
+    opacity: 0.6;
+    border-right: 0.5px solid rgba(0,0,0,0.6);
+}
+
+@media (min-width: 767px) { /* Equivalent to Tailwind's 'md' */
+    ::deep .navlink {
+        margin: 0.2rem 0.5rem 0.2rem 0;
+    }
+
+    ::deep .navlink + .navlink {
+        margin-left: 0.5rem;
+    }
+}

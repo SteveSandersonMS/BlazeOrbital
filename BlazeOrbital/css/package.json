@@ -1,0 +1,22 @@
+{
+  "name": "css",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "postcss imports.css -o ../ManufacturingHub/wwwroot/css/tailwind.bundled.min.css"
+  },
+  "author": "",
+  "devDependencies": {
+    "cssnano": "^5.0.8",
+    "postcss": "^8.3.10",
+    "postcss-cli": "^9.0.1",
+    "tailwindcss": "^2.2.17"
+  },
+  "postcss": {
+    "plugins": {
+      "tailwindcss": {},
+      "cssnano": { "preset": "default" }
+    }
+  }
+}

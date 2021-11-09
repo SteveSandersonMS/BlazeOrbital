@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <base href="%PUBLIC_URL%/" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <link href="BlazeOrbital.ManufacturingHub.styles.css" rel="stylesheet" />
+    <title>Mission Control</title>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <!-- The need to add this manually is temporary and will be eliminated soon -->
+    <script src="_content/Microsoft.AspNetCore.Components.CustomElements/BlazorCustomElements.js"></script>
+
+    <% if (process.env.NODE_ENV === 'development') { %>
+      <!-- In development only, hook up to ASP.NET Core hot reload -->
+      <script src="_framework/aspnetcore-browser-refresh.js"></script>
+    <% } %>
+  </body>
+</html>

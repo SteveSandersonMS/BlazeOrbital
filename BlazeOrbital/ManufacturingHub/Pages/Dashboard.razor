@@ -1,0 +1,137 @@
+﻿@page "/"
+@using BlazeOrbital.Data
+@inject ManufacturingData.ManufacturingDataClient ManufacturingData
+@attribute [Authorize]
+
+<div class="page">
+    @if (loadingException is not null)
+    {
+        <div class="error-box">
+            <h1 class="font-bold">Sorry, we couldn't load the dashboard data. Check your internet connection.</h1>
+            <details>
+                <summary>Technical details</summary>
+                <pre>@loadingException</pre>
+            </details>
+        </div>
+    }
+    else if (dashboardData is null)
+    {
+        <p>Loading dashboard data...</p>
+    }
+    else
+    {
+        <!-- Dashboard mockup based on https://github.com/tailwindtoolbox/Admin-Template -->
+        <div class="flex flex-wrap">
+            <div class="w-full md:w-1/3 p-4">
+                <div class="bg-gradient-to-b from-gray-200 to-gray-100 border-b-4 border-green-600 rounded-lg shadow-xl p-5 pb-4">
+                    <div class="flex flex-row items-center">
+                        <div class="flex-shrink pr-4">
+                            <div class="rounded-full p-5 bg-green-600"><i class="fa fa-wallet fa-2x fa-inverse"></i></div>
+                        </div>
+                        <div class="flex-1 text-right md:text-center">
+                            <h5 class="uppercase text-gray-600">Projects Booked</h5>
+                            <h3 class="text-2xl">$@(dashboardData.ProjectsBookedValue / 1_000_000)m</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 p-4">
+                <div class="bg-gradient-to-b from-gray-200 to-gray-100 border-b-4 border-pink-500 rounded-lg shadow-xl p-5 pb-4">
+                    <div class="flex flex-row items-center">
+                        <div class="flex-shrink pr-4">
+                            <div class="rounded-full p-5 bg-pink-600"><i class="fas fa-users fa-2x fa-inverse"></i></div>
+                        </div>
+                        <div class="flex-1 text-right md:text-center">
+                            <h5 class="uppercase text-gray-600">Next Delivery</h5>
+                            <h3 class="text-2xl">@(dashboardData.NextDeliveryDueInMs / (24*60*60*1000)) days</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 p-4">
+                <div class="bg-gradient-to-b from-gray-200 to-gray-100 border-b-4 border-yellow-600 rounded-lg shadow-xl p-5 pb-4">
+                    <div class="flex flex-row items-center">
+                        <div class="flex-shrink pr-4">
+                            <div class="rounded-full p-5 bg-yellow-600"><i class="fas fa-user-plus fa-2x fa-inverse"></i></div>
+                        </div>
+                        <div class="flex-1 text-right md:text-center">
+                            <h5 class="uppercase text-gray-600">Staff On Site</h5>
+                            <h3 class="text-2xl">@dashboardData.StaffOnSite</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 p-4">
+                <div class="bg-gradient-to-b from-gray-200 to-gray-100 border-b-4 border-blue-500 rounded-lg shadow-xl p-5 pb-4">
+                    <div class="flex flex-row items-center">
+                        <div class="flex-shrink pr-4">
+                            <div class="rounded-full p-5 bg-blue-600"><i class="fas fa-server fa-2x fa-inverse"></i></div>
+                        </div>
+                        <div class="flex-1 text-right md:text-center">
+                            <h5 class="uppercase text-gray-600">Factory Uptime</h5>
+                            <h3 class="text-2xl">@(dashboardData.FactoryUptimeMs / (24*60*60*1000)) days</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 p-4">
+                <div class="bg-gradient-to-b from-gray-200 to-gray-100 border-b-4 border-indigo-500 rounded-lg shadow-xl p-5 pb-4">
+                    <div class="flex flex-row items-center">
+                        <div class="flex-shrink pr-4">
+                            <div class="rounded-full p-5 bg-indigo-600"><i class="fas fa-tasks fa-2x fa-inverse"></i></div>
+                        </div>
+                        <div class="flex-1 text-right md:text-center">
+                            <h5 class="uppercase text-gray-600">Servicing Tasks</h5>
+                            <h3 class="text-2xl">@dashboardData.ServicingTasksDue due</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 p-4">
+                <div class="bg-gradient-to-b from-gray-200 to-gray-100 border-b-4 border-red-500 rounded-lg shadow-xl p-5 pb-4">
+                    <div class="flex flex-row items-center">
+                        <div class="flex-shrink pr-4">
+                            <div class="rounded-full p-5 bg-red-600"><i class="fas fa-inbox fa-2x fa-inverse"></i></div>
+                        </div>
+                        <div class="flex-1 text-right md:text-center">
+                            <h5 class="uppercase text-gray-600">Stopped Machines</h5>
+                            <h3 class="text-2xl">@dashboardData.MachinesStopped</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap text-center">
+            <div class="w-full md:w-1/2 p-4">
+                <div class="rounded-md p-5 border-b-4 border-yellow-500" style="background-color: #EBEBEB">
+                    <h5 class="uppercase text-gray-600">Power Consumption</h5>
+                    <div class="h-56" style="background-image: url(dashboard/graph1.png); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 p-4">
+                <div class="rounded-md p-5 border-b-4 border-green-500" style="background-color: #EBEBEB">
+                    <h5 class="uppercase text-gray-600">Units Produced</h5>
+                    <div class="h-56" style="background-image: url(dashboard/graph2.png); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private DashboardReply? dashboardData;
+    private Exception? loadingException;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            dashboardData = await ManufacturingData.GetDashboardDataAsync(new DashboardRequest());
+        }
+        catch (Exception ex)
+        {
+            loadingException = ex;
+        }
+    }
+}

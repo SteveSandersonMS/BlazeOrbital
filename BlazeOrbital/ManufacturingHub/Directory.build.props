@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <!-- The following two are to suppress spurious build warnings from consuming Sqlite. These will become unnecessary when the Sqlite packages contain a dedicated WASM binary. -->
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <EmccExtraLDFlags>-s WARN_ON_UNDEFINED_SYMBOLS=0</EmccExtraLDFlags>
+    </PropertyGroup>
+</Project>

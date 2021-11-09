@@ -1,0 +1,8 @@
+.search {
+    font-size: 0.9rem;
+    color: black;
+    border-radius: 10rem;
+    padding: 0.25rem 1rem 0.15rem;
+}
+
+inventory-grid table { filter: invert(1); }
