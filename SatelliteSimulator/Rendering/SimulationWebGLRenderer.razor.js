@@ -99,7 +99,7 @@ export function init(elem, component) {
 
             const count = Blazor.platform.getArrayLength(suns);
             const stride = bufferInfo.attribs.satellitePosition.stride;
-            const data = new Float32Array(Module.HEAP8.buffer, Blazor.platform.getArrayEntryPtr(suns, 0, stride), count * stride);
+            const data = new Float32Array(Module.HEAP8.buffer, Blazor.platform.getArrayEntryPtr(suns, 0, stride), count * (stride / 4));
 
             twgl.setAttribInfoBufferFromArray(gl, bufferInfo.attribs.position, circleVertices);
             twgl.setAttribInfoBufferFromArray(gl, bufferInfo.attribs.satellitePosition, data);
@@ -111,7 +111,7 @@ export function init(elem, component) {
         renderSatellites(satellites) {
             const count = Blazor.platform.getArrayLength(satellites);
             const stride = bufferInfo.attribs.satellitePosition.stride;
-            const data = new Float32Array(Module.HEAP8.buffer, Blazor.platform.getArrayEntryPtr(satellites, 0, stride), count * stride);
+            const data = new Float32Array(Module.HEAP8.buffer, Blazor.platform.getArrayEntryPtr(satellites, 0, stride), count * (stride / 4));
 
             twgl.setAttribInfoBufferFromArray(gl, bufferInfo.attribs.position, pointVertices);
             twgl.setAttribInfoBufferFromArray(gl, bufferInfo.attribs.satellitePosition, data);
